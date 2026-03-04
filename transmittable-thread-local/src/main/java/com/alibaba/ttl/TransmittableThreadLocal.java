@@ -742,6 +742,7 @@ public class TransmittableThreadLocal<T> extends InheritableThreadLocal<T> imple
 
                             // clear the TTL values that is not in captured
                             // avoid the extra TTL values after replay when run task
+                            // 清除不在捕获快照中的ttl值，如果一旦被TtlRunnable装饰，如果继续添加值到transmittableThreadLocal在这里会被移除
                             if (!captured.containsKey(threadLocal)) {
                                 iterator.remove();
                                 threadLocal.superRemove();
@@ -749,8 +750,10 @@ public class TransmittableThreadLocal<T> extends InheritableThreadLocal<T> imple
                         }
 
                         // set TTL values to captured
+                        // 设置捕获快照中的值到子线程
                         setTtlValuesTo(captured);
 
+                        // 执行
                         // call beforeExecute callback
                         doExecuteCallback(true);
 

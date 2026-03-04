@@ -50,11 +50,13 @@ public final class TtlRunnable implements Runnable, TtlWrapper<Runnable>, TtlEnh
      */
     @Override
     public void run() {
+        // 冻结主线程当前所有 TTL 上下文，生成“快照”随任务一起传递
         final Object captured = capturedRef.get();
         if (captured == null || releaseTtlValueReferenceAfterRun && !capturedRef.compareAndSet(captured, null)) {
             throw new IllegalStateException("TTL value reference is released after run!");
         }
 
+        // 将快照恢复到子线程中
         final Object backup = replay(captured);
         try {
             runnable.run();
